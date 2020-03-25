@@ -34,7 +34,7 @@ For maximum cross platform support. You can run this on Windows, Linux, Raspberr
 
 ## Features
 Once the script is running, either whisper or group chat to your followers to signal a command. There are 
-several built-in commands which I'll label below. Anything not a command will just be sent verbatim, e.g. if you
+several built-in commands which I'll detail below. Anything not a command will just be sent verbatim, e.g. if you
 whisper `/character do this`, they'll execute `do this`
 
   * Attacking
@@ -48,12 +48,12 @@ whisper `/character do this`, they'll execute `do this`
   * Healing your group
     * Define `group_heal_spell`, command `healg`
   * Logging off
-    * In the case of script failure, rather than just exiting quietly, you can define `logoff_command` to
-      execute
+    * In the case of script failure, rather than just exiting quietly, you can define a `logoff_command` to
+      execute to safely exit your character
   * Logging data
     * Define `log_file` and all script output will be written to this file for later analysis/debugging
   * Triggers
-    * A powerful regex trigger based system let's you match inputs and autogenerate outputs. See the example
+    * A powerful regex trigger based system lets you match inputs and autogenerate outputs. See the example
       below to see how to use this feature
       
 ## Sample requirements script
