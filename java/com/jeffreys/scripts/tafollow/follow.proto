@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_package = "com.jeffreys.scripts.tafollow";
+option java_multiple_files = true;
+
+import "java/com/jeffreys/scripts/common/common.proto";
+
+package scripts.tafollow;
+
+// Next: 10
+message Configuration {
+  repeated string owner = 1;
+  int32 number_of_physical_attacks = 2;
+  string heal_spell = 3;
+  string group_heal_spell = 4;
+  string attack_spell = 5;
+  string group_attack_spell = 6;
+  string log_off_command = 7;
+  string log_file = 8;
+
+  repeated scripts.common.Trigger triggers = 9;
+}
