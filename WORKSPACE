@@ -1,6 +1,20 @@
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
+new_git_repository(
+    name = "org_kohsuke_arg4j",
+    remote = "https://github.com/kohsuke/args4j.git",
+    tag = "args4j-site-2.33",
+    build_file_content = """
+java_library(
+  name = "args4j",
+  visibility = ["//visibility:public"],
+  srcs = glob(["args4j/src/org/kohsuke/args4j/**/*.java"]),
+  resources = glob(["args4j/src/org/kohsuke/args4j/*.properties"]),
+  deps = [],
+)""",
+)
+
 # rules_java defines rules for generating Java code from Protocol Buffers.
 http_archive(
     name = "rules_java",

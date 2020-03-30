@@ -5,60 +5,53 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.ByteStreams;
 import com.jeffreys.common.ansi.AnsiColorParser;
 import com.jeffreys.common.ansi.AnsiColorParser.ParsedAnsiText;
-import com.jeffreys.common.proto.Protos;
+import com.jeffreys.common.queue.NonBlockingSupplier;
 import com.jeffreys.scripts.common.Triggers;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Scanner;
+import java.time.Duration;
+import javax.inject.Inject;
 
 public class TAFollow {
   private static final Splitter SPACE_SPLITTER = Splitter.on(' ').trimResults().omitEmptyStrings();
 
-  private final Scanner scanner;
+  private final NonBlockingSupplier<String> lineSupplier;
   private final PrintWriter output;
   private final PrintWriter logfile;
   private final Configuration configuration;
   private final AnsiColorParser ansiColorParser = new AnsiColorParser();
   private final ImmutableSet<String> expectedCommands;
   private final Triggers triggers;
+  private final Duration lineGetTimeoutDuration;
 
-  TAFollow(Scanner scanner, PrintWriter output, PrintWriter logfile, Configuration configuration) {
-    this.scanner = scanner;
+  @Inject
+  TAFollow(
+      NonBlockingSupplier<String> lineSupplier,
+      @Annotations.OutputPrintWriter PrintWriter output,
+      @Annotations.LogfilePrintWriter PrintWriter logfile,
+      Configuration configuration,
+      Triggers triggers) {
+    this.lineSupplier = lineSupplier;
     this.output = output;
     this.logfile = logfile;
     this.configuration = configuration;
-    this.triggers = Triggers.of(configuration.getTriggersList());
+    this.triggers = triggers;
+    this.lineGetTimeoutDuration = Duration.ofMillis(configuration.getIdleCommandWaitMilliseconds());
 
     ImmutableSet.Builder<String> expectedCommandsBuilder = ImmutableSet.builder();
     for (String owner : configuration.getOwnerList()) {
       expectedCommandsBuilder.add(String.format("From %s (whispered): ", owner));
       expectedCommandsBuilder.add(String.format("From %s (to group): ", owner));
     }
-    expectedCommands = expectedCommandsBuilder.build();
+    this.expectedCommands = expectedCommandsBuilder.build();
   }
 
   private static PrintWriter getPrintWriter(String file) throws IOException {
     OutputStream outputStream =
         file.isEmpty() ? ByteStreams.nullOutputStream() : new FileOutputStream(file);
     return new PrintWriter(outputStream, /* autoFlush= */ true);
-  }
-
-  public static void main(String[] args) {
-    try {
-      Configuration configuration = Protos.parseProtoFromTextFile(args[0], Configuration.class);
-
-      new TAFollow(
-              new Scanner(System.in),
-              new PrintWriter(System.out, /* autoflush= */ true),
-              getPrintWriter(configuration.getLogFile()),
-              configuration)
-          .run();
-    } catch (Throwable t) {
-      t.printStackTrace();
-      System.exit(1);
-    }
   }
 
   private void attack(String target) {
@@ -137,10 +130,17 @@ public class TAFollow {
     }
   }
 
-  void run() {
+  void run() throws Exception {
     try {
       while (true) {
-        String line = scanner.nextLine();
+        String line = lineSupplier.get(lineGetTimeoutDuration);
+        if (line == null) {
+          if (!configuration.getIdleCommand().isEmpty()) {
+            output.print(configuration.getIdleCommand());
+            output.flush();
+          }
+          continue;
+        }
 
         logfile.println(line);
         logfile.flush();
