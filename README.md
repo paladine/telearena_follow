@@ -10,9 +10,9 @@ To build a deployable jar, run `bazel build //java/com/jeffreys/scripts/tafollow
 To execute tests, run `bazel test ...`
 
 ## How to execute?
-`java -jar TAFollow.jar <file with text proto of scripts.tafollow.Configuration>`
+`java -jar TAFollow.jar --config=<file with text proto of scripts.tafollow.Configuration>`
   
-You can also run out of the repo directory, `bazel run //java/com/jeffreys/scripts/tafollow:TAFollow -- <file with text proto>`
+You can also run out of the repo directory, `bazel run //java/com/jeffreys/scripts/tafollow:TAFollow -- --config=<file with text proto>`
 
 But you're connected to a BBS playing TA, so you need to execute this in the context of my other program - [TelnetScripter](https://github.com/paladine/telnet_scripter)
 
@@ -68,6 +68,8 @@ owner: "Fistandantilus"
 owner: "Justarius"
 number_of_physical_attacks: 6
 log_file: "/tmp/tasslehoff.log"
+idle_command: "\r\n"
+idle_command_wait_milliseconds: 10000
 triggers: {
   expected_color: CYAN
   trigger_regex: ".*You found (\\d+) gold crowns while searching the.*"
