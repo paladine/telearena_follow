@@ -13,7 +13,6 @@ import com.jeffreys.common.queue.NonBlockingSuppliers;
 import com.jeffreys.scripts.common.Triggers;
 import com.jeffreys.scripts.tafollow.Annotations.LogfilePrintWriter;
 import com.jeffreys.scripts.tafollow.Annotations.OutputPrintWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -48,7 +47,7 @@ public class Main {
       OutputStream outputStream =
           configuration.getLogFile().isEmpty()
               ? ByteStreams.nullOutputStream()
-              : new FileOutputStream(new File(configuration.getLogFile()));
+              : new FileOutputStream(configuration.getLogFile());
 
       return new PrintWriter(outputStream, /* autoFlush= */ true);
     }

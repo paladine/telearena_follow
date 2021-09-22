@@ -1,22 +1,15 @@
 package com.jeffreys.scripts.tafollow;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.ByteStreams;
 import com.jeffreys.common.ansi.AnsiColorParser;
 import com.jeffreys.common.ansi.AnsiColorParser.ParsedAnsiText;
 import com.jeffreys.common.queue.NonBlockingSupplier;
 import com.jeffreys.scripts.common.Triggers;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.time.Duration;
 import javax.inject.Inject;
 
 public class TAFollow {
-  private static final Splitter SPACE_SPLITTER = Splitter.on(' ').trimResults().omitEmptyStrings();
-
   private final NonBlockingSupplier<String> lineSupplier;
   private final PrintWriter output;
   private final PrintWriter logfile;
@@ -46,12 +39,6 @@ public class TAFollow {
       expectedCommandsBuilder.add(String.format("From %s (to group): ", owner));
     }
     this.expectedCommands = expectedCommandsBuilder.build();
-  }
-
-  private static PrintWriter getPrintWriter(String file) throws IOException {
-    OutputStream outputStream =
-        file.isEmpty() ? ByteStreams.nullOutputStream() : new FileOutputStream(file);
-    return new PrintWriter(outputStream, /* autoFlush= */ true);
   }
 
   private void attack(String target) {
